@@ -1,2 +1,2 @@
 # Airrohr-CLI
-Sensordaten von deinem Airrohr im Terminal
+Deine Airrohr Sensordaten im Terminal
