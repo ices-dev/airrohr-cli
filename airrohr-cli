@@ -1,0 +1,121 @@
+#!/bin/bash
+
+#### Airrohr CLI
+#
+# Displays temperature, humidity & fine dust in your terminal
+#
+# Author    :   ices@posteo.de
+# Date      :   04.10.2017   
+#
+#### Version 0.1 BETA
+
+#### Hilfe!
+if [[ $1 == "-h" ]]||[[ $1 == "--help" ]]; then
+    echo "Benutzung: $0 [-OPTION]"
+    echo "  Anzeige von Temperatur, Luftfeuchtigkeit und Feinstaub"
+    echo ""
+    echo "Optionen"
+    echo "  -c      rekonfiguration $0"
+    echo "  -h      zeige die Hilfe"
+    echo "  --help  zeige die Hilfe"
+    echo ""
+    echo "Per default werden folgende Werte angezeigt:"
+    echo "  -Temperatur"
+    echo "  -Luftfeuchtigkeit"
+    echo "  -Feinstaub PM10"
+    echo "  -Feinstaub PM2.5"
+    echo ""
+    echo "Beim ersten Start oder der Option -c wird eine Standardkonfiguration angelegt."
+    echo "In der Datei ~/.airrohr.conf können Sie einstellen welche Sensorwerte angezeigt werden sollen."
+    exit
+fi
+
+#### Config Datei vorhanden?
+if [ ! -e ~/.airrohr.conf ]||[[ $1 == "-c" ]]; then
+    echo "In der Bestätigungsmail für den Eintrag in die Luftdaten.info Datenbank wurden Ihnen 2 IDs mitgeteilt:"
+    echo ""
+    echo "1. Feinstaub PM10 u. PM2.5"
+    echo "2. Temperatur u. Luftfeuchte (Karte in Arbeit)"
+    echo ""
+    read -p "Bitte Luftdaten.info Karten-ID für Feinstaub: " FSID
+    read -p "Bitte Luftdaten.info Karten-ID für Temperatur / Luftfeuchtigkeit: " THID
+    echo "# Luftdaten.info Map-ID temperature/humidity " > ~/.airrohr.conf
+    echo "TEMP/HUMI: $THID" >> ~/.airrohr.conf
+    echo "" >> ~/.airrohr.conf
+    echo "# Luftdaten.info Map-ID fine particles" >> ~/.airrohr.conf
+    echo "FINE/PART: $FSID" >> ~/.airrohr.conf
+    echo "" >> ~/.airrohr.conf
+    echo "# Settings" >> ~/.airrohr.conf
+    echo "show_temperature: true" >> ~/.airrohr.conf
+    echo "show_humidity: true" >> ~/.airrohr.conf
+    echo "show_pm10: true" >> ~/.airrohr.conf
+    echo "show_pm2.5: true" >> ~/.airrohr.conf
+    echo "" >> ~/.airrohr.conf
+    echo "# Style [Colors 0-7]" >> ~/.airrohr.conf
+    echo "seperator: ~" >> ~/.airrohr.conf
+    echo "show_color: false" >> ~/.airrohr.conf
+    echo "text_color: 7" >> ~/.airrohr.conf
+    echo "bg_color: 4" >> ~/.airrohr.conf
+    echo ""
+    echo "Done. Weitere Einstellungen können in der ~/.airrohr.conf vorgenommen werden."
+    echo ""
+fi
+
+### Config auslesen
+FSID=$(cat ~/.airrohr.conf|grep FINE|cut -d " " -f 2)
+THID=$(cat ~/.airrohr.conf|grep TEMP|cut -d " " -f 2)
+SHOW[1]=$(cat ~/.airrohr.conf|grep show_temp|cut -d " " -f 2)
+SHOW[2]=$(cat ~/.airrohr.conf|grep show_humi|cut -d " " -f 2)
+SHOW[3]=$(cat ~/.airrohr.conf|grep show_pm10|cut -d " " -f 2)
+SHOW[4]=$(cat ~/.airrohr.conf|grep show_pm2.|cut -d " " -f 2)
+SEPERATOR=$(cat ~/.airrohr.conf|grep seperator|cut -d " " -f 2)
+FARBE=$(cat ~/.airrohr.conf|grep show_color|cut -d " " -f 2)
+TFARBE=$(cat ~/.airrohr.conf|grep text_color|cut -d " " -f 2)
+BFARBE=$(cat ~/.airrohr.conf|grep bg_color|cut -d " " -f 2)
+
+#### Abfrage der Sensordaten
+if [[ ${SHOW[1]} == "true" ]]||[[ ${SHOW[2]} == "true" ]];then
+curl -s http://api.luftdaten.info/v1/sensor/$THID/ > ~/.luftdaten.tmp
+if [[ $? != 0 ]];then
+    echo "Keine Verbindung zu Luftdaten.info möglich."
+    exit 1
+fi
+TEMPERATUR=$(cat ~/.luftdaten.tmp|cut -d '"' -f 118)
+LUFTFEUCHT=$(cat ~/.luftdaten.tmp|cut -d '"' -f 128)
+fi
+
+if [[ ${SHOW[3]} == "true" ]]||[[ ${SHOW[4]} == "true" ]];then
+curl -s http://api.luftdaten.info/v1/sensor/$FSID/ > ~/.luftdaten.tmp
+if [[ $? != 0 ]];then
+    echo "Keine Verbindung zu Luftdaten.info möglich."
+    exit 1
+fi
+FEINPM10=$(cat ~/.luftdaten.tmp|cut -d '"' -f 118)
+FEINPM25=$(cat ~/.luftdaten.tmp|cut -d '"' -f 128)
+fi
+
+### Ausgabe der Sensordaten
+AUSGABE[1]="Temperatur: ${TEMPERATUR%?}\xc2\xb0C"
+AUSGABE[2]="Luftfeuchtigkeit: ${LUFTFEUCHT%?}%"
+AUSGABE[3]="PM10: ${FEINPM10%?}\xc2\xb5g/m³"
+AUSGABE[4]="PM2.5: ${FEINPM25%?}\xc2\xb5g/m³"
+      
+if [[ $FARBE == "true" ]]&&[[ $TFARBE < 8 ]]&&[[ $BFARBE < 8 ]];then
+    tput setaf $TFARBE
+    tput setab $BFARBE
+fi    
+
+AUSG=0
+
+for (( i=1 ; i<5 ; i++ ));do
+    if [[ ${SHOW[$i]} == "true" ]];then
+        if (( $AUSG > 0 ));then
+            echo -n -e " $SEPERATOR "
+        fi    
+        echo -n -e "${AUSGABE[$i]}"
+        AUSG=$((AUSG+1))
+    fi
+    done                            
+echo ""
+
+rm  ~/.luftdaten.tmp 
