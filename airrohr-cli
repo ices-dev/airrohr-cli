@@ -80,8 +80,10 @@ if [[ $? != 0 ]];then
     echo "Keine Verbindung zu Luftdaten.info möglich."
     exit 1
 fi
-TEMPERATUR=$(cat ~/.luftdaten.tmp|cut -d '"' -f 118)
-LUFTFEUCHT=$(cat ~/.luftdaten.tmp|cut -d '"' -f 128)
+#TEMPERATUR=$(cat ~/.luftdaten.tmp|cut -d '"' -f 118)
+#LUFTFEUCHT=$(cat ~/.luftdaten.tmp|cut -d '"' -f 128)
+TEMPERATUR=$(cat ~/.luftdaten.tmp|python -mjson.tool|grep '"value"'|tail -n 2|head -n 1|cut -d '"' -f 4)
+LUFTFEUCHT=$(cat ~/.luftdaten.tmp|python -mjson.tool|grep '"value"'|tail -n 2|tail -n 1|cut -d '"' -f 4)
 fi
 
 if [[ ${SHOW[3]} == "true" ]]||[[ ${SHOW[4]} == "true" ]];then
@@ -90,8 +92,8 @@ if [[ $? != 0 ]];then
     echo "Keine Verbindung zu Luftdaten.info möglich."
     exit 1
 fi
-FEINPM10=$(cat ~/.luftdaten.tmp|cut -d '"' -f 118)
-FEINPM25=$(cat ~/.luftdaten.tmp|cut -d '"' -f 128)
+FEINPM10=$(cat ~/.luftdaten.tmp|python -mjson.tool|grep '"value"'|tail -n 2|head -n 1|cut -d '"' -f 4)
+FEINPM25=$(cat ~/.luftdaten.tmp|python -mjson.tool|grep '"value"'|tail -n 2|tail -n 1|cut -d '"' -f 4)
 fi
 
 ### Ausgabe der Sensordaten
