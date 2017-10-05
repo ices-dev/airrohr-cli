@@ -56,7 +56,6 @@ if [ ! -e ~/.airrohr.conf ]||[[ $1 == "-c" ]]; then
     echo "show_color: false" >> ~/.airrohr.conf
     echo "text_color: 7" >> ~/.airrohr.conf
     echo "bg_color: 4" >> ~/.airrohr.conf
-    echo "bold_text: false" >> ~/.airrohr.conf
     echo ""
     echo "Done. Weitere Einstellungen können in der ~/.airrohr.conf vorgenommen werden."
     echo ""
@@ -71,7 +70,6 @@ SHOW[3]=$(cat ~/.airrohr.conf|grep show_pm10|cut -d " " -f 2)
 SHOW[4]=$(cat ~/.airrohr.conf|grep show_pm2.|cut -d " " -f 2)
 SEPERATOR=$(cat ~/.airrohr.conf|grep seperator|cut -d " " -f 2)
 FARBE=$(cat ~/.airrohr.conf|grep show_color|cut -d " " -f 2)
-FETT=$(cat ~/.airrohr.conf|grep text_color|cut -d " " -f 2)
 TFARBE=$(cat ~/.airrohr.conf|grep text_color|cut -d " " -f 2)
 BFARBE=$(cat ~/.airrohr.conf|grep bg_color|cut -d " " -f 2)
 
@@ -107,10 +105,6 @@ AUSGABE[4]="PM2.5: ${FEINPM25%?}\xc2\xb5g/m³"
 if [[ $FARBE == "true" ]]&&[[ $TFARBE < 8 ]]&&[[ $BFARBE < 8 ]];then
     tput setaf $TFARBE
     tput setab $BFARBE
-fi
-
-if [[ $FETT == "true" ]];then
-    tput bold
 fi
 
 AUSG=0
