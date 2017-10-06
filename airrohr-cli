@@ -5,9 +5,10 @@
 # Displays temperature, humidity & fine dust in your terminal
 #
 # Author    :   ices@posteo.de
-# Date      :   05.10.2017   
+# Repo      :   https://github.com/ices-dev/airrohr-cli
+# Date      :   06.10.2017   
 #
-#### Version 0.1 BETA
+#### Version 0.1
 
 #### Hilfe!
 if [[ $1 == "-h" ]]||[[ $1 == "--help" ]]; then
