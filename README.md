@@ -1,6 +1,8 @@
 # Airrohr-Cli
 *Deine Airrohr Sensordaten im Terminal*
 
+![alt text](https://github.com/ices-dev/airrohr-cli/blob/master/screenshots/airrohr-cli.png "Screenshot Debian Stretch")
+
 ### Beschreibung
 Airrohr-Cli ist ein Bash Skript welches dir die Sensordaten eines Airrohrs im Terminal anzeigt.
 
