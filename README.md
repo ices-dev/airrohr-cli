@@ -16,3 +16,7 @@ Getestet unter macOS und Debian Linux.
 Das Skript startet beim ersten Start oder mit der Option `-c` ein interaktives Menü bei dem die Karten-IDs des Sensors eingetragen werden.
 ### Konfiguration
 Das Skript speichert seine Einstellungen in der Datei `~/.airrohr.conf`. Durch editieren der Datei kann die Ausgabe von Sensorwerten aus und eingeschaltet werden, das Trennzeichen geändert und die Farbe der Ausgabe angepasst werden.
+### Links
+[Blogbeitrag](https://www.zsh.ninja/airrohr-cli-luftdaten-info-im-terminal/)
+
+[Luftdaten.info](http://luftdaten.info)
